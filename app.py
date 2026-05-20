@@ -38,6 +38,11 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+PLOTLY_CONFIG = {
+    "displayModeBar": False,
+    "responsive": True,
+}
+
 
 def inject_css() -> None:
     """Apply a polished academic visual style."""
@@ -379,9 +384,9 @@ def render_tabs(result: ACORunResult) -> None:
 def render_simulator_tab(result: ACORunResult) -> None:
     left, right = st.columns([1.35, 1.0], gap="large")
     with left:
-        st.plotly_chart(route_figure(result), use_container_width=True)
+        st.plotly_chart(route_figure(result), use_container_width=True, config=PLOTLY_CONFIG)
     with right:
-        st.plotly_chart(convergence_figure(result), use_container_width=True)
+        st.plotly_chart(convergence_figure(result), use_container_width=True, config=PLOTLY_CONFIG)
         st.markdown("**Ruta encontrada**")
         route_text = " -> ".join(result.cities[city_id].label for city_id in display_route_cycle(result))
         st.code(route_text, language="text")
@@ -420,13 +425,13 @@ def render_pheromones_tab(result: ACORunResult) -> None:
     )
     left, right = st.columns([1.05, 1.0], gap="large")
     with left:
-        st.plotly_chart(pheromone_network_figure(result), use_container_width=True)
+        st.plotly_chart(pheromone_network_figure(result), use_container_width=True, config=PLOTLY_CONFIG)
     with right:
-        st.plotly_chart(pheromone_heatmap_figure(result), use_container_width=True)
+        st.plotly_chart(pheromone_heatmap_figure(result), use_container_width=True, config=PLOTLY_CONFIG)
 
 
 def render_learning_tab() -> None:
-    st.plotly_chart(colony_flow_figure(), use_container_width=True)
+    st.plotly_chart(colony_flow_figure(), use_container_width=True, config=PLOTLY_CONFIG)
 
     st.subheader("Inspiracion biologica")
     columns = st.columns(4)

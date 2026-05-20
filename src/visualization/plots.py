@@ -118,7 +118,18 @@ def convergence_figure(result: ACORunResult) -> go.Figure:
     )
     fig.update_xaxes(title="Iteracion", showgrid=True, gridcolor=GRID)
     fig.update_yaxes(title="Longitud del recorrido", showgrid=True, gridcolor=GRID)
-    return _base_layout(fig, "Convergencia del algoritmo", height=420)
+    _base_layout(fig, "Convergencia del algoritmo", height=470)
+    fig.update_layout(
+        margin={"l": 54, "r": 18, "t": 72, "b": 96},
+        legend={
+            "orientation": "h",
+            "yanchor": "top",
+            "y": -0.2,
+            "xanchor": "left",
+            "x": 0.0,
+        },
+    )
+    return fig
 
 
 def pheromone_network_figure(result: ACORunResult, max_edges: int = 35) -> go.Figure:
