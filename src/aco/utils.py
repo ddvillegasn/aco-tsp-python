@@ -29,6 +29,35 @@ def generate_cities(
     ]
 
 
+def generate_classroom_example_cities() -> list[City]:
+    """Return the 5-city classroom TSP example with optimal tour length 14."""
+
+    base_points = np.array(
+        [
+            [0.0, 2.0],
+            [3.0, 4.0],
+            [6.0, 2.0],
+            [4.0, 0.0],
+            [1.0, 0.0],
+        ],
+        dtype=float,
+    )
+    perimeter = float(
+        sum(
+            np.linalg.norm(current - next_point)
+            for current, next_point in zip(base_points, [*base_points[1:], base_points[0]])
+        )
+    )
+    scaled_points = base_points * (14.0 / perimeter) + np.array([2.0, 2.0])
+
+    return [
+        City(id=index, x=float(x), y=float(y), label=label)
+        for index, (label, (x, y)) in enumerate(
+            zip(["A", "B", "C", "D", "E"], scaled_points)
+        )
+    ]
+
+
 def build_distance_matrix(cities: Sequence[City]) -> np.ndarray:
     """Build a symmetric Euclidean distance matrix."""
 

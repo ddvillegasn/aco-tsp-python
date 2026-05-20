@@ -4,7 +4,12 @@ import numpy as np
 
 from src.aco import ACOParameters, AntColonyOptimizer
 from src.aco.models import City
-from src.aco.utils import build_distance_matrix, generate_cities, route_length
+from src.aco.utils import (
+    build_distance_matrix,
+    generate_cities,
+    generate_classroom_example_cities,
+    route_length,
+)
 
 
 def test_distance_matrix_is_symmetric_and_euclidean() -> None:
@@ -94,3 +99,11 @@ def test_best_history_is_monotonic_non_increasing() -> None:
         later <= earlier
         for earlier, later in zip(result.best_history, result.best_history[1:])
     )
+
+
+def test_classroom_example_has_expected_route_length() -> None:
+    cities = generate_classroom_example_cities()
+    distances = build_distance_matrix(cities)
+
+    assert [city.label for city in cities] == ["A", "B", "C", "D", "E"]
+    assert np.isclose(route_length([0, 1, 2, 3, 4], distances), 14.0)

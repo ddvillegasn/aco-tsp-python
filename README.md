@@ -22,6 +22,7 @@ Algoritmo Colonia de Hormigas, ACO, aplicado al TSP.
 - Implementacion propia del algoritmo ACO en Python.
 - Interfaz interactiva con Streamlit.
 - Control de numero de ciudades, hormigas, alpha, beta, rho, Q, iteraciones y semilla.
+- Preset del ejemplo de clase con ciudades A-E y recorrido esperado de longitud 14.00.
 - Visualizacion de la mejor ruta encontrada.
 - Grafica de convergencia por iteracion.
 - Red de feromonas y matriz de calor.
@@ -42,6 +43,16 @@ streamlit run app.py
 
 La aplicacion se abrira en el navegador. Desde la barra lateral se pueden ajustar los parametros
 del experimento y la simulacion se actualiza automaticamente.
+
+Para replicar el ejemplo visto en clase, selecciona **Ejemplo de clase A-E** en la barra lateral.
+La ruta esperada es:
+
+```text
+A -> B -> C -> D -> E -> A
+Longitud: 14.00
+```
+
+Como el TSP es un ciclo, la misma solucion tambien puede aparecer rotada o invertida.
 
 ## Como funciona el algoritmo
 

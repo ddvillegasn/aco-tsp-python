@@ -5,7 +5,12 @@ from __future__ import annotations
 import pandas as pd
 import streamlit as st
 
-from src.aco import ACOParameters, AntColonyOptimizer, generate_cities
+from src.aco import (
+    ACOParameters,
+    AntColonyOptimizer,
+    generate_cities,
+    generate_classroom_example_cities,
+)
 from src.aco.models import ACORunResult
 from src.content.educational import (
     ADVANTAGES,
@@ -218,6 +223,7 @@ def inject_css() -> None:
 
 @st.cache_data(show_spinner=False)
 def run_simulation(
+    instance_mode: str,
     num_cities: int,
     num_ants: int,
     alpha: float,
@@ -230,7 +236,11 @@ def run_simulation(
 ) -> ACORunResult:
     """Generate a TSP instance and solve it with ACO."""
 
-    cities = generate_cities(num_cities=num_cities, seed=seed)
+    if instance_mode == "classroom":
+        cities = generate_classroom_example_cities()
+    else:
+        cities = generate_cities(num_cities=num_cities, seed=seed)
+
     parameters = ACOParameters(
         num_ants=num_ants,
         alpha=alpha,
@@ -257,13 +267,26 @@ def main() -> None:
     render_tabs(result)
 
 
-def render_sidebar() -> dict[str, int | float]:
+def render_sidebar() -> dict[str, int | float | str]:
     st.sidebar.header("Parametros ACO")
     st.sidebar.caption("Ajusta el experimento y observa como cambia la ruta.")
 
-    num_cities = st.sidebar.slider("Numero de ciudades", 5, 40, 18, 1)
-    seed = st.sidebar.number_input("Semilla aleatoria", min_value=0, max_value=9999, value=42, step=1)
-    num_ants = st.sidebar.slider("Numero de hormigas", 1, 120, max(20, num_cities), 1)
+    instance_label = st.sidebar.selectbox(
+        "Instancia TSP",
+        ["Ejemplo de clase A-E", "Ciudades aleatorias"],
+        index=0,
+    )
+    instance_mode = "classroom" if instance_label.startswith("Ejemplo") else "random"
+
+    if instance_mode == "classroom":
+        st.sidebar.info("Caso fijo: A -> B -> C -> D -> E -> A tiene longitud esperada 14.00.")
+        num_cities = 5
+    else:
+        num_cities = st.sidebar.slider("Numero de ciudades", 5, 40, 18, 1)
+
+    seed = st.sidebar.number_input("Semilla aleatoria", min_value=0, max_value=9999, value=425, step=1)
+    default_ants = 20 if instance_mode == "classroom" else max(20, num_cities)
+    num_ants = st.sidebar.slider("Numero de hormigas", 1, 120, default_ants, 1)
 
     st.sidebar.divider()
     alpha = st.sidebar.slider("Alpha: influencia de feromonas", 0.0, 4.0, 1.0, 0.1)
@@ -277,6 +300,7 @@ def render_sidebar() -> dict[str, int | float]:
         st.caption("Complejidad aproximada: O(t_max * m * n^2).")
 
     return {
+        "instance_mode": instance_mode,
         "num_cities": int(num_cities),
         "num_ants": int(num_ants),
         "alpha": float(alpha),
@@ -359,10 +383,14 @@ def render_simulator_tab(result: ACORunResult) -> None:
     with right:
         st.plotly_chart(convergence_figure(result), use_container_width=True)
         st.markdown("**Ruta encontrada**")
-        route_text = " -> ".join(
-            result.cities[city_id].label for city_id in result.best_route_cycle
-        )
+        route_text = " -> ".join(result.cities[city_id].label for city_id in display_route_cycle(result))
         st.code(route_text, language="text")
+
+        if [city.label for city in result.cities] == ["A", "B", "C", "D", "E"]:
+            st.success(
+                "Para este ejemplo, una ruta optima esperada es A -> B -> C -> D -> E -> A "
+                "con longitud 14.00. Si aparece invertida o rotada, es la misma solucion TSP."
+            )
 
     st.markdown(
         """
@@ -534,6 +562,21 @@ def render_list_card(title: str, items: list[str]) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def display_route_cycle(result: ACORunResult) -> list[int]:
+    """Rotate and orient a cycle for readable display without changing the solution."""
+
+    if not result.best_route:
+        return []
+
+    route = list(result.best_route)
+    origin = 0 if 0 in route else route[0]
+    origin_index = route.index(origin)
+    rotated = route[origin_index:] + route[:origin_index]
+    reversed_rotated = [rotated[0], *reversed(rotated[1:])]
+    selected = min(rotated, reversed_rotated)
+    return [*selected, selected[0]]
 
 
 if __name__ == "__main__":
