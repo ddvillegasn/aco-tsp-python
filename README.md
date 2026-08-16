@@ -1,5 +1,7 @@
 # ACO TSP Python
 
+[![tests](https://github.com/ddvillegasn/aco-tsp-python/actions/workflows/tests.yml/badge.svg)](https://github.com/ddvillegasn/aco-tsp-python/actions/workflows/tests.yml)
+
 Proyecto final de Investigacion de Operaciones sobre el algoritmo Colonia de Hormigas, ACO
 (*Ant Colony Optimization*), aplicado al Problema del Viajero de Comercio, TSP.
 
